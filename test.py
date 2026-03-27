@@ -28,7 +28,7 @@ fig.update_traces(mode="lines", marker=dict(size=8))
 events = plotly_events(
     fig,
     click_event=True,
-    hover_event=False,
+    hover_event=True,
     select_event=False,
     key="simple_line"
 )
