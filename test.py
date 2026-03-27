@@ -7,22 +7,35 @@ Created on Tue Mar 17 14:02:59 2026
 @author: Albin
 """
 import streamlit as st
-import streamlit.components.v1 as components
+import plotly.express as px
+from streamlit_plotly_events2 import plotly_events
+import pandas as pd
 
-# Declare the component
-zoom_listener = components.declare_component(
-    "zoom_listener",
-    path="zoom_listener/frontend"   # folder containing index.html
+st.set_page_config(page_title="plotly_events minimal test", layout="centered")
+st.title("Minimal plotly_events test (line plot)")
+
+# Simple data
+df = pd.DataFrame({
+    "x": list(range(1, 11)),
+    "y": [2, 1, 3, 5, 4, 6, 7, 5, 8, 9]
+})
+
+# Line chart with markers (points are clickable/selectable)
+fig = px.line(df, x="x", y="y", title="Click points on the line")
+fig.update_traces(mode="lines", marker=dict(size=8))
+
+# Listen for click events
+events = plotly_events(
+    fig,
+    click_event=True,
+    hover_event=False,
+    select_event=False,
+    key="simple_line"
 )
 
-# Use the component
-ranges = zoom_listener()
-st.write("Zoom state:", ranges)
+st.write("Events:", events)
+if events:
+    ev = events[0]
+    st.success(f"Clicked point -> x={ev.get('x')}, y={ev.get('y')}, "
+               f"curve={ev.get('curveNumber')}, point={ev.get('pointNumber')}")
 
-if ranges:
-    st.download_button(
-        "⬇️ Download Zoom State",
-        data=str(ranges),
-        file_name="zoom_state.json",
-        mime="application/json"
-    )
